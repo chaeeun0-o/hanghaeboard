@@ -21,8 +21,6 @@ public class BoardController {
         return boardService.createBoard(requestDto);
     }
 
-
-
     @GetMapping("/api/boards")
     public List<BoardResponseDto> getListBoards(){return boardService.getListBoards();
     }

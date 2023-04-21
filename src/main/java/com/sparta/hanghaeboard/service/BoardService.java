@@ -19,7 +19,6 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    @Transactional
     public BoardResponseDto createBoard(BoardRequestDto requestDto) {
         Board board = new Board(requestDto);
         boardRepository.save(board);
@@ -42,11 +41,9 @@ public class BoardService {
     //선택 조회
     @Transactional(readOnly = true)
     public BoardResponseDto getBoard(Long id) {
-        //boardRepository 와 연결해서, id 를 찾는다
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
-        //데이터가 들어간 객체 board 를 BoardResponseDto 로 반환
         return new BoardResponseDto(board);   //추가
     }
 
