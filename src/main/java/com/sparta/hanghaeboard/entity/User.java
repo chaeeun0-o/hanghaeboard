@@ -40,5 +40,4 @@ public class User {
         this.email = requestDto.getEmail();
         this.role = requestDto.getRole();
     }
-
 }

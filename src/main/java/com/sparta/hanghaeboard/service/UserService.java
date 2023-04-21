@@ -42,8 +42,8 @@ public class UserService {
         User user = new User(userRequestsDto);
         userRepository.save(user);
 
-        StatusDto statusMessageDto = StatusDto.setSuccess(StatusEnum.OK.getStatusCode(), "회원가입 완료", null);
-        return new ResponseEntity(statusMessageDto, HttpStatus.OK);
+        StatusDto statusDto = StatusDto.setSuccess(StatusEnum.OK.getStatusCode(), "회원가입 완료", null);
+        return new ResponseEntity(statusDto, HttpStatus.OK);
     }
 
     // 로그인
