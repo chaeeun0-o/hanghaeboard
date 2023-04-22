@@ -25,9 +25,6 @@ public class Board extends Timestamped {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private String password;
-
 //    public Board(BoardRequestDto requestDto) {
 //        this.title = requestDto.getTitle();
 //        this.contents = requestDto.getContents();
