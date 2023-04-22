@@ -1,6 +1,7 @@
 package com.sparta.hanghaeboard.dto;
 
 import com.sparta.hanghaeboard.entity.Board;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;

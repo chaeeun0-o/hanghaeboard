@@ -7,12 +7,14 @@ import com.sparta.hanghaeboard.dto.UserRequestsDto;
 import com.sparta.hanghaeboard.entity.StatusEnum;
 import com.sparta.hanghaeboard.entity.User;
 import com.sparta.hanghaeboard.entity.UserRoleEnum;
+import com.sparta.hanghaeboard.jwt.JwtUtil;
 import com.sparta.hanghaeboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 
@@ -22,11 +24,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
+    private final JwtUtil jwtUtil;
 
     public ResponseEntity<StatusDto> userSignup(UserRequestsDto userRequestsDto) {
         String username = userRequestsDto.getUsername();
 
-        // 회원 중복 확인
+            // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
             throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
@@ -42,12 +45,16 @@ public class UserService {
         User user = new User(userRequestsDto);
         userRepository.save(user);
 
-        StatusDto statusDto = StatusDto.setSuccess(StatusEnum.OK.getStatusCode(), "회원가입 완료", null);
+        StatusDto statusDto = StatusDto.setSuccess(StatusEnum.OK.getStatusCode(), "사용자 회원가입 완료", null);
+        if(user.getRole() == UserRoleEnum.ADMIN){
+            statusDto = StatusDto.setSuccess(StatusEnum.OK.getStatusCode(), "관리자 회원가입 완료", null);
+        }
         return new ResponseEntity(statusDto, HttpStatus.OK);
     }
 
     // 로그인
-    public String userLogin(LoginRequestsDto loginRequestsDto) {
+
+    public ResponseEntity<StatusDto> userLogin(LoginRequestsDto loginRequestsDto, HttpServletResponse response) {
 
         User user = userRepository.findByUsername(loginRequestsDto.getUsername()).orElseThrow(
                 () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
@@ -70,7 +77,13 @@ public class UserService {
         if (!user.getPassword().equals(loginRequestsDto.getPassword())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
-        // JWT + 상태코드
-        return "로그인 성공";
+        // JWT
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
+        // 상태코드
+        StatusDto statusDto = StatusDto.setSuccess(StatusEnum.OK.getStatusCode(), "사용자 로그인 완료", null);
+        if(user.getRole() == UserRoleEnum.ADMIN){
+            statusDto = StatusDto.setSuccess(StatusEnum.OK.getStatusCode(), "관리자 로그인 완료", null);
+        }
+        return new ResponseEntity(statusDto, HttpStatus.OK);
     }
 }
