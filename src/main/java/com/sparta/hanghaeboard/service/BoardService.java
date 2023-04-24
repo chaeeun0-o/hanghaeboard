@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,10 +36,6 @@ public class BoardService {
         // 토큰 검사
         User user = tokenCheck(request);
         // 보드를 세이브하고
-//        Board board = new Board(requestDto);
-//        boardRepository.save(board);
-//        boardRepository.save(new Board(requestDto);
-//        boardRepository.save(new Board(requestDto, user));
         return new BoardResponseDto(boardRepository.save(new Board(requestDto, user)));
     }
 
@@ -68,7 +65,7 @@ public class BoardService {
         // 토크이 있는지, 토큰 검증, 토큰 주인의 아이디 -> user
         // 토큰의 username 이랑 선택한 게시글의 username 이랑 비교해서 맞으면 수정 틀리면 exception
         Board board = boardRepository.findBoardByIdAndUsername(id, user.getUsername()).orElseThrow(
-                () -> new NullPointerException("해당 게시글을 수정할 권한이 없습니다.")
+              () -> new NoSuchElementException("해당 게시글을 수정할 권한이 없습니다.")
         );
         board.update(requestDto);
         return new BoardResponseDto(board);
@@ -79,7 +76,7 @@ public class BoardService {
     public ResponseEntity<StatusDto> deleteBoard(Long id, HttpServletRequest request) {
         User user = tokenCheck(request);
         Board board = boardRepository.findBoardByIdAndUsername(id, user.getUsername()).orElseThrow(
-                () -> new NullPointerException("해당 게시글을 삭제할 권한이 없습니다.")
+                () -> new NoSuchElementException("해당 게시글을 삭제할 권한이 없습니다.")
         );
         boardRepository.delete(board);
 
